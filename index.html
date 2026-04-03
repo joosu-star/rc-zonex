@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RC SYSTEM</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>RC SYSTEM</h1>
+
+<div class="nav">
+  <button onclick="vista('inicio')">Inicio</button>
+  <button onclick="vista('clientes')">Clientes</button>
+  <button onclick="vista('historial')">Historial</button>
+</div>
+
+<div class="top">
+  <button onclick="abrirCaja()">Abrir Caja</button>
+  <button onclick="cerrarCaja()">Cerrar Caja</button>
+</div>
+
+<h2 id="dinero">$0</h2>
+
+<div id="inicio" class="show">
+  <div id="coches"></div>
+</div>
+
+<div id="clientes">
+  <div id="listaClientes"></div>
+</div>
+
+<div id="historial">
+  <div id="listaHistorial"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
