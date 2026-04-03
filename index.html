@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>RC SYSTEM</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>RC SYSTEM PRO</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>RC SYSTEM</h1>
+<h1>🚗 RC SYSTEM PRO</h1>
 
-<div>
-  <button id="btnInicio">Inicio</button>
-  <button id="btnClientes">Clientes</button>
-  <button id="btnHistorial">Historial</button>
+<div class="nav">
+  <button onclick="cambiarVista('inicio')">Inicio</button>
+  <button onclick="cambiarVista('clientes')">Clientes</button>
+  <button onclick="cambiarVista('historial')">Historial</button>
 </div>
 
-<div>
-  <button id="abrirCaja">Abrir Caja</button>
-  <button id="cerrarCaja">Cerrar Caja</button>
+<div class="top">
+  <button onclick="abrirCaja()">Abrir Caja</button>
+  <button onclick="cerrarCaja()">Cerrar Caja</button>
+  <button onclick="hacerRetiro()">Retiro</button>
+  <button onclick="hacerDeposito()">Depósito</button>
 </div>
 
-<h2 id="dinero">$0</h2>
+<h2 id="dinero">💰 $0</h2>
 
-<div id="inicio" class="show">
+<div id="inicio" class="vista activo">
   <div id="coches"></div>
 </div>
 
-<div id="clientes">
+<div id="clientes" class="vista">
+  <h2>Clientes</h2>
   <div id="listaClientes"></div>
 </div>
 
-<div id="historial">
+<div id="historial" class="vista">
+  <h2>Historial</h2>
   <div id="listaHistorial"></div>
+</div>
+
+<div id="modal" class="modal oculto">
+  <div class="contenido">
+    <h3>Iniciar coche</h3>
+    <input id="nombre" placeholder="Nombre">
+    <input id="tiempo" type="number" placeholder="Minutos">
+    <button onclick="confirmarInicio()">Iniciar</button>
+    <button onclick="cerrarModal()">Cancelar</button>
+  </div>
 </div>
 
 <script src="app.js"></script>
