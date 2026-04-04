@@ -362,5 +362,4 @@ function borrarHistorial(){
   guardar();
   renderHistorial();
 }
-
 window.borrarHistorial = borrarHistorial;
