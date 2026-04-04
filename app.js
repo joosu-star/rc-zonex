@@ -8,13 +8,18 @@ let data = JSON.parse(localStorage.getItem("rc_data")) || {
   caja: { abierta:false, inicial:0 }
 };
 
-// FIX DATOS VIEJOS
-if(!data.depositos) data.depositos = [];
-if(!data.clientes) data.clientes = [];
+// FIX DATOS (IMPORTANTE)
+if(!Array.isArray(data.coches)) data.coches = [];
+if(!Array.isArray(data.clientes)) data.clientes = [];
+if(!Array.isArray(data.ventas)) data.ventas = [];
+if(!Array.isArray(data.retiros)) data.retiros = [];
+if(!Array.isArray(data.depositos)) data.depositos = [];
+if(!Array.isArray(data.historial)) data.historial = [];
+if(!data.caja) data.caja = { abierta:false, inicial:0 };
 
 let cocheSel = null;
 
-// CREAR COCHES
+// CREAR COCHES (TODOS)
 if(data.coches.length===0){
   data.coches = [
     "Drift 1","Drift 2",
@@ -34,7 +39,7 @@ function guardar(){
   localStorage.setItem("rc_data", JSON.stringify(data));
 }
 
-// CAMBIAR VISTA
+// VISTAS
 function cambiarVista(v){
   document.querySelectorAll(".vista").forEach(el=>{
     el.classList.remove("activo");
@@ -47,7 +52,7 @@ function cambiarVista(v){
   if(v==="historial") renderHistorial();
 }
 
-// RENDER
+// RENDER COCHES
 function render(){
   const cont = document.getElementById("coches");
   cont.innerHTML="";
@@ -108,11 +113,11 @@ function abrirModal(i){
   }
 
   cocheSel=i;
-  document.getElementById("modal").classList.remove("oculto");
+  document.getElementById("modal").classList.add("activo");
 }
 
 function cerrarModal(){
-  document.getElementById("modal").classList.add("oculto");
+  document.getElementById("modal").classList.remove("activo");
 }
 
 // INICIAR
@@ -309,4 +314,18 @@ function hacerDeposito(){
 }
 
 // INIT
-window.onload = render;
+window.addEventListener("DOMContentLoaded", ()=>{
+  render();
+});
+
+// HACER FUNCIONES GLOBALES
+window.cambiarVista = cambiarVista;
+window.abrirModal = abrirModal;
+window.cerrarModal = cerrarModal;
+window.confirmarInicio = confirmarInicio;
+window.terminar = terminar;
+window.cancelar = cancelar;
+window.abrirCaja = abrirCaja;
+window.cerrarCaja = cerrarCaja;
+window.hacerRetiro = hacerRetiro;
+window.hacerDeposito = hacerDeposito;
