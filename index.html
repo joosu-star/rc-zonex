@@ -24,17 +24,22 @@
 
 <h2 id="dinero">💰 $0</h2>
 
+<div class="panel">
+  <h3>💲 Precios</h3>
+  <button onclick="editarPrecios()">Editar precios</button>
+</div>
+
 <div id="inicio" class="vista activo">
   <div id="coches"></div>
 </div>
 
 <div id="clientes" class="vista">
-  <h2>Clientes</h2>
+  <h2>👥 Clientes</h2>
   <div id="listaClientes"></div>
 </div>
 
 <div id="historial" class="vista">
-  <h2>Historial</h2>
+  <h2>📜 Historial</h2>
   <div id="listaHistorial"></div>
 </div>
 
@@ -48,6 +53,8 @@
   </div>
 </div>
 
-<script defer src="app.js"></script>
+<audio id="alarma" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+<script src="app.js"></script>
 </body>
 </html>
