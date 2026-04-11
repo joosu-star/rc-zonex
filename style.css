@@ -11,7 +11,6 @@ body {
   text-align: center;
 }
 
-/* vistas */
 .vista { display: none; }
 .vista.activo { display: block; }
 
@@ -23,7 +22,6 @@ button {
   cursor: pointer;
 }
 
-/* grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -37,13 +35,11 @@ button {
   background: #1e293b;
 }
 
-/* estados */
 .libre { opacity: 0.5; }
 .activo { border: 2px solid #22c55e; }
 .poco { border: 2px solid orange; }
 .terminado { border: 2px solid red; }
 
-/* modal */
 .modal {
   display: none;
   position: fixed;
@@ -64,7 +60,6 @@ button {
   border-radius:10px;
 }
 
-/* panel */
 .panel {
   background:#1e293b;
   margin:15px;
@@ -72,7 +67,6 @@ button {
   border-radius:10px;
 }
 
-/* cards */
 .card {
   background:#1e293b;
   margin:10px;
@@ -81,6 +75,34 @@ button {
   text-align:left;
 }
 
-.verde { color:#22c55e; }
-.rojo { color:#ef4444; }
-.azul { color:#3b82f6; }
+/* 🔥 IMPRESIÓN TÉRMICA */
+@media print {
+  body * { visibility: hidden; }
+
+  #ticketArea, #ticketArea * {
+    visibility: visible;
+  }
+
+  #ticketArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 58mm;
+    background: white;
+    color: black;
+  }
+
+  #ticket {
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+
+  hr {
+    border: none;
+    border-top: 1px dashed black;
+    margin: 5px 0;
+  }
+}
