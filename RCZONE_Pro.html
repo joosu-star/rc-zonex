@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC ZONE 189</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #080c14;
+  --bg2: #0d1523;
+  --bg3: #111d30;
+  --bg4: #162035;
+  --accent: #00d4ff;
+  --accent2: #00ff88;
+  --accent3: #ff6b35;
+  --warn: #ffb830;
+  --danger: #ff3860;
+  --text: #e8eef6;
+  --text2: #8ba0bc;
+  --text3: #4a6080;
+  --border: rgba(0,212,255,0.12);
+  --border2: rgba(0,212,255,0.25);
+  --radius: 10px;
+  --glow: 0 0 20px rgba(0,212,255,0.08);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 3px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 2px;
+  margin-top: 3px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.caja-estado {
+  margin: 12px 14px;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.caja-label { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+.caja-monto { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; color: var(--accent2); margin-top: 2px; }
+.caja-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-top: 6px;
+  font-weight: 600; letter-spacing: 0.5px;
+}
+.caja-badge.abierta { background: rgba(0,255,136,0.1); color: var(--accent2); border: 1px solid rgba(0,255,136,0.2); }
+.caja-badge.cerrada { background: rgba(255,56,96,0.1); color: var(--danger); border: 1px solid rgba(255,56,96,0.2); }
+.caja-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+.nav { flex:1; padding: 8px 0; overflow-y: auto; }
+.nav-section { padding: 12px 16px 4px; font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+.nav-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 9px 16px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text2); font-size: 13px; font-family: 'Inter', sans-serif;
+  text-align: left; transition: all 0.15s; border-radius: 0;
+  position: relative;
+}
+.nav-btn:hover { background: rgba(0,212,255,0.05); color: var(--text); }
+.nav-btn.active { background: rgba(0,212,255,0.08); color: var(--accent); }
+.nav-btn.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background: var(--accent); }
+.nav-icon { width: 16px; height: 16px; opacity: 0.7; flex-shrink: 0; }
+.nav-btn.active .nav-icon { opacity: 1; }
+
+.sidebar-actions { padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+.btn-caja {
+  padding: 8px; border-radius: var(--radius); border: 1px solid;
+  cursor: pointer; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+  transition: all 0.15s; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-abrir { background: rgba(0,255,136,0.08); border-color: rgba(0,255,136,0.2); color: var(--accent2); }
+.btn-abrir:hover { background: rgba(0,255,136,0.15); }
+.btn-cerrar { background: rgba(255,56,96,0.08); border-color: rgba(255,56,96,0.2); color: var(--danger); }
+.btn-cerrar:hover { background: rgba(255,56,96,0.15); }
+.btn-row { display: flex; gap: 6px; }
+.btn-retiro { flex:1; background: rgba(255,184,48,0.08); border-color: rgba(255,184,48,0.2); color: var(--warn); }
+.btn-retiro:hover { background: rgba(255,184,48,0.15); }
+.btn-deposito { flex:1; background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.2); color: var(--accent); }
+.btn-deposito:hover { background: rgba(0,212,255,0.15); }
+
+/* ─── MAIN ─────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: 1px;
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.search-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 6px 12px;
+  color: var(--text); font-size: 12px; font-family: 'Inter', sans-serif;
+  width: 180px;
+}
+.search-box::placeholder { color: var(--text3); }
+.search-box:focus { outline: none; border-color: var(--border2); }
+
+.btn-export {
+  padding: 6px 14px; border-radius: var(--radius);
+  background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.2);
+  color: var(--accent2); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-export:hover { background: rgba(0,255,136,0.15); }
+.btn-pdf {
+  padding: 6px 14px; border-radius: var(--radius);
+  background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2);
+  color: var(--accent3); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-pdf:hover { background: rgba(255,107,53,0.15); }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+/* ─── VISTAS ──────────────────────────────────────────── */
+.vista { display: none; }
+.vista.activo { display: block; }
+
+/* ─── STATS ROW ─────────────────────────────────────────── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--border2); }
+.stat-label { font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+.stat-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; line-height: 1; }
+.stat-value.green { color: var(--accent2); }
+.stat-value.blue { color: var(--accent); }
+.stat-value.orange { color: var(--warn); }
+.stat-value.red { color: var(--danger); }
+.stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ─── SECCIÓN TIPO ─────────────────────────────────────── */
+.tipo-section { margin-bottom: 20px; }
+.tipo-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.tipo-nombre {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px; font-weight: 600; letter-spacing: 2px; color: var(--text);
+  text-transform: uppercase;
+}
+.tipo-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; padding: 2px 8px; border-radius: 20px;
+  background: rgba(0,212,255,0.08); color: var(--accent);
+  border: 1px solid rgba(0,212,255,0.15);
+}
+
+.coches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+/* ─── COCHE CARD ───────────────────────────────────────── */
+.coche-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px;
+  cursor: pointer; transition: all 0.2s; position: relative;
+  overflow: hidden; user-select: none;
+}
+.coche-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: transparent; transition: background 0.2s;
+}
+.coche-card.libre::before { background: var(--text3); opacity: 0.3; }
+.coche-card.activo::before { background: var(--accent2); }
+.coche-card.poco::before { background: var(--warn); }
+.coche-card.terminado::before { background: var(--danger); animation: pulse-red 1s infinite; }
+
+.coche-card.libre { opacity: 0.6; }
+.coche-card.activo { border-color: rgba(0,255,136,0.2); opacity: 1; }
+.coche-card.poco { border-color: rgba(255,184,48,0.3); opacity: 1; }
+.coche-card.terminado { border-color: rgba(255,56,96,0.3); opacity: 1; }
+
+.coche-nombre {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px; font-weight: 700; color: var(--text);
+  letter-spacing: 1px; margin-bottom: 4px;
+}
+.coche-cliente { font-size: 11px; color: var(--text2); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coche-tiempo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 600; margin: 6px 0 8px;
+  color: var(--accent);
+}
+.coche-tiempo.poco { color: var(--warn); }
+.coche-tiempo.terminado { color: var(--danger); }
+.coche-tiempo.libre { color: var(--text3); font-size: 12px; }
+
+.coche-acciones { display: flex; gap: 5px; flex-wrap: wrap; }
+.btn-mini {
+  flex: 1; padding: 5px 6px; border-radius: 6px; border: 1px solid;
+  cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: all 0.15s; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+}
+.btn-iniciar { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.2); color: var(--accent); }
+.btn-iniciar:hover { background: rgba(0,212,255,0.2); }
+.btn-terminar { background: rgba(0,255,136,0.08); border-color: rgba(0,255,136,0.2); color: var(--accent2); }
+.btn-terminar:hover { background: rgba(0,255,136,0.2); }
+.btn-cancelar { background: rgba(255,56,96,0.08); border-color: rgba(255,56,96,0.2); color: var(--danger); }
+.btn-cancelar:hover { background: rgba(255,56,96,0.2); }
+.btn-ticket { background: rgba(255,107,53,0.08); border-color: rgba(255,107,53,0.2); color: var(--accent3); }
+.btn-ticket:hover { background: rgba(255,107,53,0.2); }
+.btn-extender { background: rgba(255,184,48,0.08); border-color: rgba(255,184,48,0.2); color: var(--warn); }
+.btn-extender:hover { background: rgba(255,184,48,0.2); }
+
+/* ─── MODAL ──────────────────────────────────────────── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  z-index: 100; align-items: center; justify-content: center;
+}
+.overlay.activo { display: flex; }
+
+.modal-box {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 24px; width: 340px;
+  max-width: calc(100vw - 40px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px; font-weight: 700; color: var(--accent);
+  letter-spacing: 2px; margin-bottom: 16px;
+  text-transform: uppercase;
+}
+.modal-sub { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
+
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+.form-input {
+  width: 100%; background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 12px; color: var(--text);
+  font-size: 13px; font-family: 'Inter', sans-serif; transition: border-color 0.15s;
+}
+.form-input:focus { outline: none; border-color: var(--border2); }
+.form-input::placeholder { color: var(--text3); }
+.form-input option { background: var(--bg3); }
+
+.form-row { display: flex; gap: 10px; }
+.form-row .form-group { flex: 1; }
+
+.precio-preview {
+  background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.precio-preview-label { font-size: 11px; color: var(--text3); }
+.precio-preview-valor { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--accent2); }
+
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.btn-modal {
+  flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid;
+  cursor: pointer; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+  transition: all 0.15s; font-family: 'Inter', sans-serif;
+  min-width: 80px;
+}
+.btn-confirm { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: var(--accent); }
+.btn-confirm:hover { background: rgba(0,212,255,0.2); }
+.btn-confirm-ticket { background: rgba(255,107,53,0.1); border-color: rgba(255,107,53,0.3); color: var(--accent3); }
+.btn-confirm-ticket:hover { background: rgba(255,107,53,0.2); }
+.btn-cancel-modal { background: rgba(255,56,96,0.08); border-color: rgba(255,56,96,0.2); color: var(--danger); }
+.btn-cancel-modal:hover { background: rgba(255,56,96,0.15); }
+
+/* ─── HISTORIAL / CLIENTES ───────────────────────────── */
+.list-grid { display: grid; gap: 10px; }
+.list-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+.list-card:hover { border-color: var(--border2); }
+.list-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.list-card-title { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 1px; }
+.list-card-fecha { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+.list-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.list-stat { background: var(--bg3); border-radius: 6px; padding: 8px; }
+.list-stat-label { font-size: 9px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+.list-stat-value { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; }
+
+.tag {
+  display: inline-flex; align-items: center;
+  font-size: 10px; padding: 2px 8px; border-radius: 20px;
+  font-weight: 600; letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.tag-green { background: rgba(0,255,136,0.08); color: var(--accent2); border: 1px solid rgba(0,255,136,0.15); }
+.tag-blue { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.15); }
+.tag-orange { background: rgba(255,107,53,0.08); color: var(--accent3); border: 1px solid rgba(255,107,53,0.15); }
+.tag-warn { background: rgba(255,184,48,0.08); color: var(--warn); border: 1px solid rgba(255,184,48,0.15); }
+
+/* ─── PRECIOS ─────────────────────────────────────────── */
+.precios-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.precio-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  text-align: center;
+}
+.precio-tipo { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.precio-valor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px; font-weight: 600; color: var(--accent); margin: 6px 0;
+}
+.precio-nota { font-size: 10px; color: var(--text3); }
+.btn-edit-precio {
+  margin-top: 10px; padding: 6px 14px; border-radius: 6px;
+  background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);
+  color: var(--accent); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
+}
+.btn-edit-precio:hover { background: rgba(0,212,255,0.15); }
+
+/* ─── ANIMACIONES ─────────────────────────────────────── */
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── SCROLLBAR ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text3); border-radius: 2px; }
+
+/* ─── EMPTY STATE ─────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 48px 20px; color: var(--text3);
+}
+.empty-state-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state-text { font-size: 14px; }
+
+/* ─── VENTAS RECIENTES ───────────────────────────────── */
+.ventas-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ventas-table th {
+  text-align: left; padding: 8px 12px;
+  font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase;
+  border-bottom: 1px solid var(--border); font-weight: 500;
+}
+.ventas-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.ventas-table tr:hover td { background: rgba(0,212,255,0.03); }
+.ventas-table td:first-child { color: var(--text); font-weight: 500; }
+.ventas-table td.monto { font-family: 'JetBrains Mono', monospace; color: var(--accent2); font-weight: 600; }
+
+/* ─── SECTION CARD ────────────────────────────────────── */
+.section-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 16px;
+}
+.section-card-header {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 600; letter-spacing: 2px; color: var(--text2);
+  text-transform: uppercase;
+}
+.section-card-body { padding: 16px; }
+
+/* ─── CLIENTES TABLE ─────────────────────────────────── */
+.cliente-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--border);
+  font-size: 12px; align-items: center;
+}
+.cliente-row:hover { background: rgba(0,212,255,0.03); }
+.cliente-row.header {
+  font-size: 10px; color: var(--text3); letter-spacing: 1.5px;
+  text-transform: uppercase; font-weight: 500;
+}
+
+/* ─── TOOLTIP ───────────────────────────────────────── */
+.tooltip-container { position: relative; }
+.tooltip {
+  position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: var(--bg4); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 6px 10px; font-size: 11px;
+  color: var(--text); white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity 0.2s; z-index: 200;
+}
+.tooltip-container:hover .tooltip { opacity: 1; }
+
+/* ─── IMPRESIÓN ──────────────────────────────────────── */
+@media print {
+  @page { size: 80mm auto; margin: 0; }
+  body { margin: 0; padding: 0; }
+  body * { visibility: hidden; }
+  #ticketArea, #ticketArea * { visibility: visible; }
+  #ticketArea {
+    position: absolute; left: 0; top: 0; width: 80mm;
+  }
+  #ticket {
+    width: 100%; max-width: 72mm; margin: 0 auto;
+    font-family: monospace; font-size: 13px; text-align: center;
+    color: #000 !important; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .t-bold { font-weight: 900 !important; }
+  .t-line { border-top: 2px dashed black; margin: 8px 0; }
+}
+
+/* ─── NOTIFICACIÓN TOAST ──────────────────────────────── */
+#toast-container {
+  position: fixed; bottom: 20px; right: 20px;
+  z-index: 999; display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 12px; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+  animation: slideIn 0.2s ease; max-width: 280px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.toast.success { border-color: rgba(0,255,136,0.3); }
+.toast.error { border-color: rgba(255,56,96,0.3); }
+.toast.info { border-color: rgba(0,212,255,0.3); }
+.toast-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.toast.success .toast-dot { background: var(--accent2); }
+.toast.error .toast-dot { background: var(--danger); }
+.toast.info .toast-dot { background: var(--accent); }
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ─── DASHBOARD ───────────────────────────────────────── */
+.dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-title">RC ZONE</div>
+    <div class="logo-sub">PLAZA TANGAMANGA C115</div>
+  </div>
+
+  <div class="caja-estado">
+    <div class="caja-label">Efectivo en caja</div>
+    <div class="caja-monto" id="sb-monto">$0</div>
+    <div id="sb-badge" class="caja-badge cerrada">Caja cerrada</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">Operación</div>
+    <button class="nav-btn active" onclick="cambiarVista('inicio')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Pista en vivo
+    </button>
+    <button class="nav-btn" onclick="cambiarVista('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" onclick="cambiarVista('ventas')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Ventas del día
+    </button>
+    <div class="nav-section">Registros</div>
+    <button class="nav-btn" onclick="cambiarVista('clientes')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Clientes activos
+    </button>
+    <button class="nav-btn" onclick="cambiarVista('historial')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+      Historial de caja
+    </button>
+    <div class="nav-section">Configuración</div>
+    <button class="nav-btn" onclick="cambiarVista('precios')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 1 1-14.14 0"/></svg>
+      Precios
+    </button>
+  </nav>
+
+  <div class="sidebar-actions">
+    <div class="btn-row">
+      <button class="btn-caja btn-abrir" onclick="abrirCaja()">▶ Abrir</button>
+      <button class="btn-caja btn-cerrar" onclick="cerrarCaja()">■ Cerrar</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn-caja btn-retiro" onclick="hacerRetiro()">↓ Retiro</button>
+      <button class="btn-caja btn-deposito" onclick="hacerDeposito()">↑ Depósito</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">PISTA EN VIVO</span>
+    <div class="topbar-right">
+      <input class="search-box" id="search-box" type="text" placeholder="Buscar cliente..." oninput="filtrarCoches(this.value)">
+      <button class="btn-export" onclick="exportarExcel()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Excel
+      </button>
+      <button class="btn-pdf" onclick="imprimirCorte()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Corte
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- INICIO: PISTA EN VIVO -->
+    <div id="inicio" class="vista activo">
+      <div class="stats-row" id="stats-inicio"></div>
+      <div id="coches-container"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="vista">
+      <div class="stats-row" id="stats-dash"></div>
+      <div class="dash-row">
+        <div class="section-card">
+          <div class="section-card-header">
+            <span class="section-card-title">Ventas recientes</span>
+          </div>
+          <div class="section-card-body" style="padding:0">
+            <table class="ventas-table">
+              <thead><tr><th>Cliente</th><th>Coche</th><th>Tiempo</th><th>Monto</th><th>Hora</th></tr></thead>
+              <tbody id="dash-ventas"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-header">
+            <span class="section-card-title">Movimientos de caja</span>
+          </div>
+          <div class="section-card-body" style="padding:0">
+            <table class="ventas-table">
+              <thead><tr><th>Tipo</th><th>Monto</th><th>Hora</th></tr></thead>
+              <tbody id="dash-movimientos"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENTAS -->
+    <div id="ventas" class="vista">
+      <div class="stats-row" id="stats-ventas"></div>
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Registro de ventas</span>
+          <button class="btn-export" style="font-size:11px;padding:4px 10px;" onclick="exportarVentas()">Exportar</button>
+        </div>
+        <div class="section-card-body" style="padding:0">
+          <table class="ventas-table" style="width:100%">
+            <thead><tr><th>#</th><th>Cliente</th><th>Coche</th><th>Tiempo</th><th>Hora</th><th>Monto</th></tr></thead>
+            <tbody id="tabla-ventas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="clientes" class="vista">
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Clientes en pista ahora</span>
+          <span id="total-clientes" class="tag tag-blue">0 activos</span>
+        </div>
+        <div class="section-card-body" style="padding:0">
+          <div class="cliente-row header">
+            <span>Cliente</span><span>Coche</span><span>Entrada</span><span>Tiempo</span>
+          </div>
+          <div id="lista-clientes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div id="historial" class="vista">
+      <div class="topbar" style="border:none;padding:0 0 16px;background:none;margin-bottom:0;">
+        <span></span>
+        <div class="topbar-right">
+          <button class="btn-export" onclick="exportarHistorial()">Exportar historial</button>
+        </div>
+      </div>
+      <div id="lista-historial" class="list-grid"></div>
+    </div>
+
+    <!-- PRECIOS -->
+    <div id="precios" class="vista">
+      <div class="section-card" style="margin-bottom:16px">
+        <div class="section-card-header">
+          <span class="section-card-title">Tarifas por categoría</span>
+          <span class="tag tag-blue">por 15 min</span>
+        </div>
+        <div class="section-card-body">
+          <div class="precios-grid" id="precios-grid"></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Información del negocio</span>
+        </div>
+        <div class="section-card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre del negocio</label>
+              <input class="form-input" id="cfg-nombre" value="RC ZONE 189">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input class="form-input" id="cfg-tel" value="4442140002">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input class="form-input" id="cfg-dir" value="Plaza Tangamanga Isla C115, San Luis Potosí">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lema del ticket</label>
+            <input class="form-input" id="cfg-lema" value="TAMBIÉN VAMOS A TU FIESTA">
+          </div>
+          <button class="btn-export" style="margin-top:8px" onclick="guardarConfig()">Guardar configuración</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL INICIAR -->
+<div id="modal-iniciar" class="overlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-coche-nombre">Iniciar coche</div>
+    <div class="modal-sub" id="modal-precio-info"></div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Nombre del cliente</label>
+        <input class="form-input" id="inp-nombre" placeholder="ej. Carlos">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Minutos</label>
+        <input class="form-input" id="inp-tiempo" type="number" min="1" max="120" placeholder="15">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Paquete rápido</label>
+        <select class="form-input" id="sel-paquete" onchange="aplicarPaquete(this.value)">
+          <option value="">– elegir –</option>
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60">60 min</option>
+        </select>
+      </div>
+    </div>
+    <div class="precio-preview">
+      <span class="precio-preview-label">Total estimado</span>
+      <span class="precio-preview-valor" id="prev-precio">$0</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-confirm" onclick="confirmarInicio(false)">✔ Iniciar</button>
+      <button class="btn-modal btn-confirm-ticket" onclick="confirmarInicio(true)">🖨 + Ticket</button>
+      <button class="btn-modal btn-cancel-modal" onclick="cerrarModal('modal-iniciar')">✖ Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EXTENDER -->
+<div id="modal-extender" class="overlay">
+  <div class="modal-box">
+    <div class="modal-title">Extender tiempo</div>
+    <div class="form-group">
+      <label class="form-label">Minutos adicionales</label>
+      <input class="form-input" id="inp-extender" type="number" min="1" placeholder="15">
+    </div>
+    <div class="precio-preview">
+      <span class="precio-preview-label">Costo adicional</span>
+      <span class="precio-preview-valor" id="prev-extender">$0</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-confirm" onclick="confirmarExtender()">Extender</button>
+      <button class="btn-modal btn-cancel-modal" onclick="cerrarModal('modal-extender')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRECIO -->
+<div id="modal-precio" class="overlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-precio-titulo">Editar precio</div>
+    <div class="form-group">
+      <label class="form-label">Precio por cada 15 min ($)</label>
+      <input class="form-input" id="inp-precio-nuevo" type="number" min="1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-confirm" onclick="guardarPrecio()">Guardar</button>
+      <button class="btn-modal btn-cancel-modal" onclick="cerrarModal('modal-precio')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET AREA (solo impresión) -->
+<div id="ticketArea" style="display:none;"></div>
+
+<div id="toast-container"></div>
+
+<audio id="alarma" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+<script>
+// ══════════════════════════════════════════
+// DATOS
+// ══════════════════════════════════════════
+let data = JSON.parse(localStorage.getItem("rczone_v2")) || {};
+
+function init(){
+  data.coches = data.coches || [];
+  data.clientes = data.clientes || [];
+  data.ventas = data.ventas || [];
+  data.retiros = data.retiros || [];
+  data.depositos = data.depositos || [];
+  data.historial = data.historial || [];
+  data.caja = data.caja || { abierta:false, inicial:0 };
+  data.ticket = data.ticket || 1;
+  data.precios = data.precios || { normal:50, robot:40, luchador:40, drift:60 };
+  data.config = data.config || {
+    nombre: "RC ZONE 189",
+    tel: "4442140002",
+    dir: "Plaza Tangamanga Isla C115, San Luis Potosí",
+    lema: "TAMBIÉN VAMOS A TU FIESTA"
+  };
+
+  if(data.coches.length === 0){
+    data.coches = [
+      "Drift 1","Drift 2",
+      ...Array.from({length:10},(_,i)=>"Fútbol "+(i+1)),
+      ...Array.from({length:6},(_,i)=>"Robot "+(i+1)),
+      ...Array.from({length:10},(_,i)=>"Luchador "+(i+1))
+    ].map(n=>({
+      nombre:n, estado:"libre", tiempo:0, tiempoInicial:0,
+      cliente:"", inicio:null
+    }));
+  }
+}
+init();
+
+function guardar(){ localStorage.setItem("rczone_v2", JSON.stringify(data)); }
+
+// ── PRECIO ────────────────────────────────
+function getPrecio(nombre){
+  const n = nombre.toLowerCase();
+  if(n.includes("robot")) return data.precios.robot;
+  if(n.includes("luchador")) return data.precios.luchador;
+  if(n.includes("drift")) return data.precios.drift;
+  return data.precios.normal;
+}
+function calcCosto(nombre, mins){
+  return Math.ceil(mins/15)*getPrecio(nombre);
+}
+
+// ── TOTALES ───────────────────────────────
+function totalVentas(){ return data.ventas.reduce((a,v)=>a+v.total,0); }
+function totalRetiros(){ return data.retiros.reduce((a,v)=>a+v.monto,0); }
+function totalDepositos(){ return data.depositos.reduce((a,v)=>a+v.monto,0); }
+function totalCaja(){ return data.caja.inicial+totalVentas()+totalDepositos()-totalRetiros(); }
+
+// ══════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════
+let cocheSeleccionado = null;
+let precioEditando = null;
+let cocheExtendiendo = null;
+
+function abrirModalIniciar(i){
+  if(!data.caja.abierta){ toast("Primero abre la caja","error"); return; }
+  cocheSeleccionado = i;
+  const c = data.coches[i];
+  document.getElementById("modal-coche-nombre").textContent = c.nombre;
+  document.getElementById("modal-precio-info").textContent = `Precio: $${getPrecio(c.nombre)} / 15 min`;
+  document.getElementById("inp-nombre").value = "";
+  document.getElementById("inp-tiempo").value = "";
+  document.getElementById("sel-paquete").value = "";
+  document.getElementById("prev-precio").textContent = "$0";
+  document.getElementById("modal-iniciar").classList.add("activo");
+  setTimeout(()=>document.getElementById("inp-nombre").focus(), 100);
+}
+
+function cerrarModal(id){
+  document.getElementById(id).classList.remove("activo");
+}
+
+function aplicarPaquete(v){
+  if(!v) return;
+  document.getElementById("inp-tiempo").value = v;
+  actualizarPrevio();
+}
+
+function actualizarPrevio(){
+  if(cocheSeleccionado===null) return;
+  const mins = Number(document.getElementById("inp-tiempo").value);
+  if(mins > 0){
+    const c = data.coches[cocheSeleccionado];
+    document.getElementById("prev-precio").textContent = "$"+calcCosto(c.nombre,mins);
+  }
+}
+document.getElementById("inp-tiempo").addEventListener("input", actualizarPrevio);
+
+function confirmarInicio(conTicket=false){
+  const nombre = document.getElementById("inp-nombre").value.trim();
+  const tiempo = Number(document.getElementById("inp-tiempo").value);
+  if(!nombre || tiempo<=0){ toast("Datos inválidos","error"); return; }
+
+  const c = data.coches[cocheSeleccionado];
+  c.estado = "uso";
+  c.tiempo = tiempo;
+  c.tiempoInicial = tiempo;
+  c.cliente = nombre;
+  c.inicio = new Date().toISOString();
+  c.minutosOriginales = tiempo;
+
+  data.clientes.push({
+    nombre, coche:c.nombre,
+    inicio: new Date().toLocaleString(),
+    tiempo
+  });
+
+  guardar();
+  cerrarModal("modal-iniciar");
+  render();
+  toast(`${c.nombre} iniciado — ${nombre}`,"success");
+
+  if(conTicket){
+    const fin = new Date(new Date(c.inicio).getTime()+tiempo*60000);
+    imprimirTicket({ nombre, coche:c.nombre, inicio:new Date(c.inicio), fin, tiempo, costo:calcCosto(c.nombre,tiempo) });
+  }
+}
+
+// ── EXTENDER ───────────────────────────────
+function abrirExtender(i){
+  cocheExtendiendo = i;
+  document.getElementById("inp-extender").value = "";
+  document.getElementById("prev-extender").textContent = "$0";
+  document.getElementById("modal-extender").classList.add("activo");
+}
+document.getElementById("inp-extender").addEventListener("input", ()=>{
+  if(cocheExtendiendo===null) return;
+  const mins = Number(document.getElementById("inp-extender").value);
+  if(mins>0) document.getElementById("prev-extender").textContent = "$"+calcCosto(data.coches[cocheExtendiendo].nombre,mins);
+});
+function confirmarExtender(){
+  const mins = Number(document.getElementById("inp-extender").value);
+  if(mins<=0){ toast("Minutos inválidos","error"); return; }
+  const c = data.coches[cocheExtendiendo];
+  c.tiempo += mins;
+  c.tiempoInicial += mins;
+  guardar(); render(); cerrarModal("modal-extender");
+  toast(`Tiempo extendido +${mins} min`,"info");
+}
+
+// ── TERMINAR ──────────────────────────────
+function terminar(i){
+  const c = data.coches[i];
+  const total = calcCosto(c.nombre, c.tiempoInicial);
+  data.ventas.push({
+    cliente: c.cliente, coche: c.nombre,
+    total, tiempo: c.tiempoInicial,
+    hora: new Date().toLocaleTimeString()
+  });
+  c.estado="libre"; c.tiempo=0; c.tiempoInicial=0; c.cliente=""; c.inicio=null;
+  guardar(); render();
+  toast(`Cobro registrado — $${total}`,"success");
+}
+
+function cancelar(i){
+  const c = data.coches[i];
+  c.estado="libre"; c.tiempo=0; c.tiempoInicial=0; c.cliente=""; c.inicio=null;
+  guardar(); render();
+  toast("Turno cancelado","info");
+}
+
+function reimprimirTicket(i){
+  const c = data.coches[i];
+  if(!c.inicio) return;
+  const fin = new Date(new Date(c.inicio).getTime()+c.tiempoInicial*60000);
+  imprimirTicket({ nombre:c.cliente, coche:c.nombre, inicio:new Date(c.inicio), fin, tiempo:c.tiempoInicial, costo:calcCosto(c.nombre,c.tiempoInicial) });
+}
+
+// ══════════════════════════════════════════
+// RENDER PISTA
+// ══════════════════════════════════════════
+function estadoCSS(c){
+  if(c.estado!=="uso") return "libre";
+  if(c.tiempo<=0) return "terminado";
+  if(c.tiempo<=5) return "poco";
+  return "activo";
+}
+
+let filtroActivo = "";
+function filtrarCoches(v){ filtroActivo=v.toLowerCase(); render(); }
+
+function render(){
+  const cont = document.getElementById("coches-container");
+  cont.innerHTML = "";
+
+  const tipos = ["Drift","Fútbol","Robot","Luchador"];
+  let enUso=0, libres=0, porTerminar=0;
+
+  tipos.forEach(tipo=>{
+    const cochesTipo = data.coches.filter(c=>c.nombre.startsWith(tipo));
+    const section = document.createElement("div");
+    section.className = "tipo-section";
+
+    const enUsoTipo = cochesTipo.filter(c=>c.estado==="uso").length;
+    section.innerHTML = `
+      <div class="tipo-header">
+        <span class="tipo-nombre">${tipo}</span>
+        <span class="tipo-badge">${enUsoTipo}/${cochesTipo.length} en uso</span>
+      </div>
+    `;
+
+    const grid = document.createElement("div");
+    grid.className = "coches-grid";
+
+    data.coches.forEach((c,i)=>{
+      if(!c.nombre.startsWith(tipo)) return;
+      if(filtroActivo && !c.cliente.toLowerCase().includes(filtroActivo) && !c.nombre.toLowerCase().includes(filtroActivo)) return;
+
+      if(c.estado==="uso") enUso++;
+      else libres++;
+      if(c.estado==="uso" && c.tiempo<=5 && c.tiempo>0) porTerminar++;
+
+      const est = estadoCSS(c);
+      const div = document.createElement("div");
+      div.className = "coche-card "+est;
+
+      let tiempoHTML = "";
+      if(c.estado==="uso"){
+        const cl = c.tiempo<=5?"terminado":c.tiempo<=10?"poco":"";
+        tiempoHTML = `<div class="coche-tiempo ${cl}">${c.tiempo} min</div>`;
+      } else {
+        tiempoHTML = `<div class="coche-tiempo libre">libre</div>`;
+      }
+
+      let accionesHTML = "";
+      if(c.estado==="uso"){
+        accionesHTML = `
+          <div class="coche-acciones">
+            <button class="btn-mini btn-terminar" onclick="terminar(${i})">✔</button>
+            <button class="btn-mini btn-extender" onclick="abrirExtender(${i})">+</button>
+            <button class="btn-mini btn-ticket" onclick="reimprimirTicket(${i})">🖨</button>
+            <button class="btn-mini btn-cancelar" onclick="cancelar(${i})">✖</button>
+          </div>
+        `;
+      } else {
+        accionesHTML = `<div class="coche-acciones"><button class="btn-mini btn-iniciar" style="flex:1" onclick="abrirModalIniciar(${i})">▶ Iniciar</button></div>`;
+      }
+
+      div.innerHTML = `
+        <div class="coche-nombre">${c.nombre}</div>
+        ${c.cliente ? `<div class="coche-cliente">${c.cliente}</div>` : '<div class="coche-cliente" style="color:var(--text3)">—</div>'}
+        ${tiempoHTML}
+        ${accionesHTML}
+      `;
+
+      grid.appendChild(div);
+    });
+
+    if(grid.children.length > 0){
+      section.appendChild(grid);
+      cont.appendChild(section);
+    }
+  });
+
+  // Stats de inicio
+  const total = totalCaja();
+  document.getElementById("stats-inicio").innerHTML = `
+    <div class="stat-card"><div class="stat-label">En pista</div><div class="stat-value blue">${enUso}</div><div class="stat-sub">de ${data.coches.length} total</div></div>
+    <div class="stat-card"><div class="stat-label">Disponibles</div><div class="stat-value green">${libres}</div><div class="stat-sub">libres ahora</div></div>
+    <div class="stat-card"><div class="stat-label">Por terminar</div><div class="stat-value orange">${porTerminar}</div><div class="stat-sub">≤ 5 min</div></div>
+    <div class="stat-card"><div class="stat-label">Caja</div><div class="stat-value green">$${total}</div><div class="stat-sub">${data.ventas.length} ventas hoy</div></div>
+  `;
+
+  // Sidebar
+  document.getElementById("sb-monto").textContent = "$"+total;
+  const badge = document.getElementById("sb-badge");
+  badge.className = "caja-badge "+(data.caja.abierta?"abierta":"cerrada");
+  badge.textContent = data.caja.abierta?"Caja abierta":"Caja cerrada";
+}
+
+// ══════════════════════════════════════════
+// CAJA
+// ══════════════════════════════════════════
+function abrirCaja(){
+  if(data.caja.abierta){ toast("La caja ya está abierta","info"); return; }
+  const m = Number(prompt("Monto inicial en caja ($):"));
+  if(!m || m<=0){ toast("Monto inválido","error"); return; }
+  data.caja = { abierta:true, inicial:m, fechaApertura:new Date().toLocaleString() };
+  guardar(); render(); toast(`Caja abierta con $${m}`,"success");
+}
+
+function cerrarCaja(){
+  if(!data.caja.abierta){ toast("La caja ya está cerrada","info"); return; }
+  if(!confirm("¿Cerrar caja y guardar el corte del día?")) return;
+
+  const totalFinal = totalCaja();
+  data.historial.unshift({
+    fecha: new Date().toLocaleDateString(),
+    hora: new Date().toLocaleTimeString(),
+    inicial: data.caja.inicial,
+    ventas: totalVentas(),
+    retiros: totalRetiros(),
+    depositos: totalDepositos(),
+    total: totalFinal,
+    numVentas: data.ventas.length,
+    detalleVentas: [...data.ventas]
+  });
+
+  data.ventas=[]; data.retiros=[]; data.depositos=[];
+  data.clientes=[];
+  data.caja={abierta:false,inicial:0};
+  guardar(); render();
+  toast("Caja cerrada. Corte guardado.","success");
+}
+
+function hacerRetiro(){
+  if(!data.caja.abierta){ toast("La caja está cerrada","error"); return; }
+  const monto = Number(prompt("Monto de retiro ($):"));
+  if(!monto||monto<=0){ toast("Monto inválido","error"); return; }
+  data.retiros.push({monto, hora:new Date().toLocaleTimeString()});
+  guardar(); render();
+  toast(`Retiro de $${monto} registrado`,"info");
+}
+
+function hacerDeposito(){
+  if(!data.caja.abierta){ toast("La caja está cerrada","error"); return; }
+  const monto = Number(prompt("Monto de depósito ($):"));
+  if(!monto||monto<=0){ toast("Monto inválido","error"); return; }
+  data.depositos.push({monto, hora:new Date().toLocaleTimeString()});
+  guardar(); render();
+  toast(`Depósito de $${monto} registrado`,"info");
+}
+
+// ══════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════
+setInterval(()=>{
+  let cambio = false;
+  data.coches.forEach(c=>{
+    if(c.estado==="uso"){
+      if(c.tiempo===1){
+        const a=document.getElementById("alarma");
+        if(a){ a.currentTime=0; a.play().catch(()=>{}); }
+      }
+      c.tiempo--;
+      if(c.tiempo<0) c.tiempo=0;
+      cambio=true;
+    }
+  });
+  if(cambio){ guardar(); render(); }
+}, 60000);
+
+// ══════════════════════════════════════════
+// TICKET
+// ══════════════════════════════════════════
+function imprimirTicket(info){
+  const num = String(data.ticket).padStart(6,"0");
+  data.ticket++;
+  const area = document.getElementById("ticketArea");
+  area.innerHTML = `
+    <div id="ticket">
+      <div class="t-bold" style="font-size:18px">${data.config.nombre}</div>
+      <div>Entretenimiento al máximo</div>
+      <div>${data.config.dir}</div>
+      <br>
+      <div class="t-bold" style="font-size:16px">${data.config.tel}</div>
+      <div class="t-line"></div>
+      Ticket: ${num}<br>
+      Cliente: ${info.nombre}<br>
+      Coche: ${info.coche}<br>
+      <div class="t-line"></div>
+      Inicio:<br>${info.inicio.toLocaleString()}<br>
+      Fin:<br>${info.fin.toLocaleString()}<br>
+      Tiempo: ${info.tiempo} min
+      <div class="t-line"></div>
+      <div class="t-bold" style="font-size:16px">TOTAL: $${info.costo}</div>
+      <div class="t-line"></div>
+      <div>Gracias por tu visita</div>
+      <div class="t-bold">${data.config.lema}</div>
+    </div>`;
+  guardar();
+  area.style.display="block";
+  window.print();
+  setTimeout(()=>area.style.display="none",500);
+}
+
+function imprimirCorte(){
+  if(!data.caja.abierta){ toast("No hay caja abierta","error"); return; }
+  const area = document.getElementById("ticketArea");
+  area.innerHTML = `
+    <div id="ticket">
+      <div class="t-bold" style="font-size:18px">${data.config.nombre}</div>
+      <div class="t-line"></div>
+      <div class="t-bold">CORTE DE CAJA</div>
+      ${new Date().toLocaleString()}
+      <div class="t-line"></div>
+      Inicial: $${data.caja.inicial}<br>
+      Ventas (${data.ventas.length}): $${totalVentas()}<br>
+      Depósitos: $${totalDepositos()}<br>
+      Retiros: $${totalRetiros()}<br>
+      <div class="t-line"></div>
+      <div class="t-bold" style="font-size:16px">TOTAL: $${totalCaja()}</div>
+      <div class="t-line"></div>
+      ${data.ventas.map(v=>`${v.cliente} | ${v.coche} | $${v.total}`).join('<br>')}
+    </div>`;
+  area.style.display="block";
+  window.print();
+  setTimeout(()=>area.style.display="none",500);
+}
+
+// ══════════════════════════════════════════
+// PRECIOS
+// ══════════════════════════════════════════
+let precioKey = null;
+
+function renderPrecios(){
+  const grid = document.getElementById("precios-grid");
+  const tipos = [
+    {key:"normal", label:"Fútbol", emoji:"⚽"},
+    {key:"robot", label:"Robot", emoji:"🤖"},
+    {key:"luchador", label:"Luchador", emoji:"🥊"},
+    {key:"drift", label:"Drift", emoji:"🏎"},
+  ];
+  grid.style.gridTemplateColumns = "repeat(4,1fr)";
+  grid.innerHTML = tipos.map(t=>`
+    <div class="precio-card">
+      <div class="precio-tipo">${t.label}</div>
+      <div style="font-size:24px;margin-bottom:4px">${t.emoji}</div>
+      <div class="precio-valor" id="pv-${t.key}">$${data.precios[t.key]}</div>
+      <div class="precio-nota">por 15 min</div>
+      <button class="btn-edit-precio" onclick="abrirEditPrecio('${t.key}','${t.label}')">Editar</button>
+    </div>
+  `).join("");
+
+  document.getElementById("cfg-nombre").value = data.config.nombre;
+  document.getElementById("cfg-tel").value = data.config.tel;
+  document.getElementById("cfg-dir").value = data.config.dir;
+  document.getElementById("cfg-lema").value = data.config.lema;
+}
+
+function abrirEditPrecio(key, label){
+  precioKey = key;
+  document.getElementById("modal-precio-titulo").textContent = "Precio "+label;
+  document.getElementById("inp-precio-nuevo").value = data.precios[key];
+  document.getElementById("modal-precio").classList.add("activo");
+}
+
+function guardarPrecio(){
+  const v = Number(document.getElementById("inp-precio-nuevo").value);
+  if(v<=0){ toast("Precio inválido","error"); return; }
+  data.precios[precioKey] = v;
+  guardar(); cerrarModal("modal-precio"); renderPrecios();
+  toast("Precio actualizado","success");
+}
+
+function guardarConfig(){
+  data.config.nombre = document.getElementById("cfg-nombre").value;
+  data.config.tel = document.getElementById("cfg-tel").value;
+  data.config.dir = document.getElementById("cfg-dir").value;
+  data.config.lema = document.getElementById("cfg-lema").value;
+  guardar(); toast("Configuración guardada","success");
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard(){
+  const total = totalCaja();
+  const enUso = data.coches.filter(c=>c.estado==="uso").length;
+  document.getElementById("stats-dash").innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total en caja</div><div class="stat-value green">$${total}</div><div class="stat-sub">Desde apertura</div></div>
+    <div class="stat-card"><div class="stat-label">Ventas hoy</div><div class="stat-value blue">${data.ventas.length}</div><div class="stat-sub">$${totalVentas()} facturado</div></div>
+    <div class="stat-card"><div class="stat-label">En pista ahora</div><div class="stat-value orange">${enUso}</div><div class="stat-sub">coches activos</div></div>
+    <div class="stat-card"><div class="stat-label">Retiros</div><div class="stat-value red">$${totalRetiros()}</div><div class="stat-sub">${data.retiros.length} movimientos</div></div>
+  `;
+
+  const tbV = document.getElementById("dash-ventas");
+  tbV.innerHTML = data.ventas.length===0
+    ? '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:16px">Sin ventas aún</td></tr>'
+    : data.ventas.slice().reverse().slice(0,12).map(v=>`
+        <tr>
+          <td>${v.cliente}</td>
+          <td><span class="tag tag-blue" style="font-size:10px">${v.coche}</span></td>
+          <td>${v.tiempo||"—"} min</td>
+          <td class="monto">$${v.total}</td>
+          <td style="color:var(--text3)">${v.hora||"—"}</td>
+        </tr>`).join("");
+
+  const mov = [
+    ...data.retiros.map(r=>({tipo:"Retiro",monto:r.monto,hora:r.hora,cls:"red"})),
+    ...data.depositos.map(d=>({tipo:"Depósito",monto:d.monto,hora:d.hora,cls:"blue"})),
+  ];
+  const tbM = document.getElementById("dash-movimientos");
+  tbM.innerHTML = mov.length===0
+    ? '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:16px">Sin movimientos</td></tr>'
+    : mov.map(m=>`<tr><td><span class="tag tag-${m.cls}">${m.tipo}</span></td><td class="monto">$${m.monto}</td><td style="color:var(--text3)">${m.hora||"—"}</td></tr>`).join("");
+}
+
+// ══════════════════════════════════════════
+// VENTAS
+// ══════════════════════════════════════════
+function renderVentas(){
+  const tv = totalVentas();
+  document.getElementById("stats-ventas").innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total ventas</div><div class="stat-value green">$${tv}</div><div class="stat-sub">${data.ventas.length} operaciones</div></div>
+    <div class="stat-card"><div class="stat-label">Ticket prom.</div><div class="stat-value blue">$${data.ventas.length?Math.round(tv/data.ventas.length):0}</div><div class="stat-sub">por cliente</div></div>
+    <div class="stat-card"><div class="stat-label">Retiros</div><div class="stat-value red">$${totalRetiros()}</div><div class="stat-sub">${data.retiros.length} retiros</div></div>
+    <div class="stat-card"><div class="stat-label">Neto</div><div class="stat-value orange">$${tv-totalRetiros()}</div><div class="stat-sub">ventas − retiros</div></div>
+  `;
+
+  const tb = document.getElementById("tabla-ventas");
+  tb.innerHTML = data.ventas.length===0
+    ? '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">Sin ventas en esta caja</td></tr>'
+    : data.ventas.slice().reverse().map((v,i)=>`
+        <tr>
+          <td style="color:var(--text3)">${data.ventas.length-i}</td>
+          <td>${v.cliente}</td>
+          <td><span class="tag tag-blue" style="font-size:10px">${v.coche}</span></td>
+          <td>${v.tiempo||"—"} min</td>
+          <td style="color:var(--text3)">${v.hora||"—"}</td>
+          <td class="monto">$${v.total}</td>
+        </tr>`).join("");
+}
+
+// ══════════════════════════════════════════
+// CLIENTES
+// ══════════════════════════════════════════
+function renderClientes(){
+  const activos = data.coches.filter(c=>c.estado==="uso");
+  document.getElementById("total-clientes").textContent = activos.length+" activos";
+  const cont = document.getElementById("lista-clientes");
+  cont.innerHTML = activos.length===0
+    ? `<div class="empty-state"><div class="empty-state-icon">🏁</div><div class="empty-state-text">No hay clientes en pista ahora</div></div>`
+    : activos.map(c=>`
+        <div class="cliente-row">
+          <span style="font-weight:500">${c.cliente}</span>
+          <span><span class="tag tag-blue">${c.nombre}</span></span>
+          <span style="color:var(--text3);font-size:11px">${c.inicio?new Date(c.inicio).toLocaleTimeString():"—"}</span>
+          <span><span class="tag ${c.tiempo<=5?"tag-warn":"tag-green"}">${c.tiempo} min</span></span>
+        </div>`).join("");
+}
+
+// ══════════════════════════════════════════
+// HISTORIAL
+// ══════════════════════════════════════════
+function renderHistorial(){
+  const cont = document.getElementById("lista-historial");
+  if(data.historial.length===0){
+    cont.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Aún no hay cierres de caja registrados</div></div>`;
+    return;
+  }
+  cont.innerHTML = data.historial.map((h,i)=>`
+    <div class="list-card">
+      <div class="list-card-header">
+        <div>
+          <div class="list-card-title">📅 ${h.fecha}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${h.hora} · ${h.numVentas} ventas</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--accent2)">$${h.total}</div>
+      </div>
+      <div class="list-card-grid">
+        <div class="list-stat"><div class="list-stat-label">Inicial</div><div class="list-stat-value" style="color:var(--text2)">$${h.inicial}</div></div>
+        <div class="list-stat"><div class="list-stat-label">Ventas</div><div class="list-stat-value" style="color:var(--accent2)">$${h.ventas}</div></div>
+        <div class="list-stat"><div class="list-stat-label">Depósitos</div><div class="list-stat-value" style="color:var(--accent)">$${h.depositos||0}</div></div>
+        <div class="list-stat"><div class="list-stat-label">Retiros</div><div class="list-stat-value" style="color:var(--danger)">$${h.retiros}</div></div>
+        <div class="list-stat" style="grid-column:span 2"><div class="list-stat-label">Total neto</div><div class="list-stat-value" style="color:var(--accent2);font-size:18px">$${h.total}</div></div>
+      </div>
+      ${h.detalleVentas&&h.detalleVentas.length?`
+        <details style="margin-top:10px">
+          <summary style="font-size:11px;color:var(--text3);cursor:pointer;user-select:none">Ver detalle de ventas</summary>
+          <table class="ventas-table" style="margin-top:8px">
+            <thead><tr><th>Cliente</th><th>Coche</th><th>Monto</th></tr></thead>
+            <tbody>${h.detalleVentas.map(v=>`<tr><td>${v.cliente}</td><td>${v.coche}</td><td class="monto">$${v.total}</td></tr>`).join("")}</tbody>
+          </table>
+        </details>`:""}
+    </div>`).join("");
+}
+
+// ══════════════════════════════════════════
+// EXPORTAR EXCEL
+// ══════════════════════════════════════════
+function exportarExcel(){
+  const wb = XLSX.utils.book_new();
+
+  // Hoja ventas del día
+  const wsVentas = XLSX.utils.json_to_sheet(data.ventas.map((v,i)=>({
+    "#": i+1,
+    "Cliente": v.cliente,
+    "Coche": v.coche,
+    "Minutos": v.tiempo||0,
+    "Hora": v.hora||"",
+    "Monto": v.total
+  })));
+  XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas del día");
+
+  // Resumen caja
+  const resumen = [{
+    "Concepto":"Monto inicial","Valor":data.caja.inicial
+  },{
+    "Concepto":"Total ventas","Valor":totalVentas()
+  },{
+    "Concepto":"Total depósitos","Valor":totalDepositos()
+  },{
+    "Concepto":"Total retiros","Valor":totalRetiros()
+  },{
+    "Concepto":"TOTAL EN CAJA","Valor":totalCaja()
+  }];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen caja");
+
+  // Historial
+  if(data.historial.length){
+    const wsH = XLSX.utils.json_to_sheet(data.historial.map(h=>({
+      "Fecha":h.fecha,"Hora":h.hora,
+      "Inicial":h.inicial,"Ventas":h.ventas,
+      "Depósitos":h.depositos||0,"Retiros":h.retiros,
+      "Total":h.total,"# Ventas":h.numVentas
+    })));
+    XLSX.utils.book_append_sheet(wb, wsH, "Historial");
+  }
+
+  // Retiros y depósitos
+  const movs = [
+    ...data.retiros.map(r=>({Tipo:"Retiro",Monto:r.monto,Hora:r.hora||""})),
+    ...data.depositos.map(d=>({Tipo:"Depósito",Monto:d.monto,Hora:d.hora||""}))
+  ];
+  if(movs.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(movs), "Movimientos");
+
+  const fecha = new Date().toLocaleDateString().replace(/\//g,"-");
+  XLSX.writeFile(wb, `RCZONE_${fecha}.xlsx`);
+  toast("Excel exportado","success");
+}
+
+function exportarVentas(){
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data.ventas.map((v,i)=>({
+    "#":i+1,"Cliente":v.cliente,"Coche":v.coche,"Minutos":v.tiempo||0,"Hora":v.hora||"","Monto":v.total
+  })));
+  XLSX.utils.book_append_sheet(wb, ws, "Ventas");
+  XLSX.writeFile(wb, `Ventas_${new Date().toLocaleDateString().replace(/\//g,"-")}.xlsx`);
+  toast("Ventas exportadas","success");
+}
+
+function exportarHistorial(){
+  if(!data.historial.length){ toast("Sin historial aún","info"); return; }
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data.historial.map(h=>({
+    "Fecha":h.fecha,"Hora":h.hora,"Inicial":h.inicial,"Ventas":h.ventas,
+    "Depósitos":h.depositos||0,"Retiros":h.retiros,"Total":h.total,"# Ventas":h.numVentas
+  })));
+  XLSX.utils.book_append_sheet(wb, ws, "Historial");
+  XLSX.writeFile(wb, `Historial_RCZONE.xlsx`);
+  toast("Historial exportado","success");
+}
+
+// ══════════════════════════════════════════
+// VISTAS
+// ══════════════════════════════════════════
+const titulos = {
+  inicio:"PISTA EN VIVO",
+  dashboard:"DASHBOARD",
+  ventas:"VENTAS DEL DÍA",
+  clientes:"CLIENTES ACTIVOS",
+  historial:"HISTORIAL DE CAJA",
+  precios:"PRECIOS Y CONFIG"
+};
+
+function cambiarVista(v){
+  document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activo"));
+  document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
+  document.getElementById(v).classList.add("activo");
+  document.getElementById("topbar-title").textContent = titulos[v]||v.toUpperCase();
+
+  // Activar nav btn
+  document.querySelectorAll(".nav-btn").forEach(btn=>{
+    if(btn.getAttribute("onclick")&&btn.getAttribute("onclick").includes(`'${v}'`))
+      btn.classList.add("active");
+  });
+
+  if(v==="clientes") renderClientes();
+  if(v==="historial") renderHistorial();
+  if(v==="precios") renderPrecios();
+  if(v==="dashboard") renderDashboard();
+  if(v==="ventas") renderVentas();
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function toast(msg, type="info"){
+  const c = document.getElementById("toast-container");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-dot"></span>${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.addEventListener("DOMContentLoaded", render);
+
+Object.assign(window,{
+  cambiarVista, abrirModalIniciar, cerrarModal, confirmarInicio,
+  abrirExtender, confirmarExtender, terminar, cancelar, reimprimirTicket,
+  aplicarPaquete, actualizarPrevio, filtrarCoches,
+  abrirCaja, cerrarCaja, hacerRetiro, hacerDeposito,
+  abrirEditPrecio, guardarPrecio, guardarConfig,
+  exportarExcel, exportarVentas, exportarHistorial, imprimirCorte
+});
+</script>
+</body>
+</html>
